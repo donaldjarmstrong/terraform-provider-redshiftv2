@@ -1,0 +1,6 @@
+host     = "donnie-cluster.c23yhplqecmd.us-east-2.redshift.amazonaws.com"
+username = "awsuser"
+password = "Password5"
+port     = "5439"
+dbname   = "redshift"
+sslmode  = "require"

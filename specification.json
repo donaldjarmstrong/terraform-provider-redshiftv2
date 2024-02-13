@@ -1,0 +1,298 @@
+{
+  "provider": {
+    "name": "redshift",
+    "schema": {
+      "attributes": [
+        {
+          "name": "username",
+          "string": {
+            "description": "username",
+            "optional_required": "required"
+          }
+        },
+        {
+          "name": "password",
+          "string": {
+            "description": "password",
+            "optional_required": "required",
+            "sensitive": true
+          }
+        },
+        {
+          "name": "host",
+          "string": {
+            "description": "host",
+            "optional_required": "required"
+          }
+        },
+        {
+          "name": "port",
+          "int64": {
+            "description": "port",
+            "optional_required": "required",
+            "validators": [
+              {
+                "custom": {
+                  "imports": [
+                    {
+                      "path": "github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
+                    }
+                  ],
+                  "schema_definition": "int64validator.AtLeast(0)"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "name": "dbname",
+          "string": {
+            "description": "dbname",
+            "optional_required": "required",
+            "validators": [
+              {
+                "custom": {
+                  "imports": [
+                    {
+                      "path": "github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+                    }
+                  ],
+                  "schema_definition": "stringvalidator.LengthAtLeast(5)"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "name": "sslmode",
+          "string": {
+            "description": "For allowed values and their descriptions, see https://www.postgresql.org/docs/11/libpq-ssl.html#LIBPQ-SSL-PROTECTION",
+            "optional_required": "optional",
+            "validators": [
+              {
+                "custom": {
+                  "imports": [
+                    {
+                      "path": "github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+                    }
+                  ],
+                  "schema_definition": "stringvalidator.OneOf(\"disable\", \"allow\", \"prefer\", \"require\", \"verify-ca\", \"verify-full\")"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "resources": [
+    {
+      "name": "user",
+      "description": "in group is not implemented",
+      "schema": {
+        "attributes": [
+          {
+            "name": "id",
+            "string": {
+              "description": "Built-in identifier",
+              "computed_optional_required": "computed"
+            },
+            "plan_modifiers": [
+              {
+                "custom": {
+                  "imports": [
+                    {
+                      "path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+                    }
+                  ],
+                  "schema_definition": "stringplanmodifier.UseStateForUnknown()"
+                }
+              }
+            ]            
+          },
+          {
+            "name": "name",
+            "string": {
+              "description": "The name of the user to create. The user name can't be PUBLIC. For more information about valid names, see Names and identifiers.",
+              "computed_optional_required": "required",
+              "validators": [
+                {
+                  "custom": {
+                    "imports": [
+                      {
+                        "path": "github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+                      }
+                    ],
+                    "schema_definition": "stringvalidator.NoneOfCaseInsensitive(`public`)"
+                  }
+                },
+                {
+                  "custom": {
+                    "imports": [
+                      {
+                        "path": "github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+                      }
+                    ],
+                    "schema_definition": "stringvalidator.UTF8LengthBetween(1,127)"
+                  }
+                },
+                {
+                  "custom": {
+                    "imports": [
+                      {
+                        "path": "github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+                      },
+                      {
+                        "path": "terraform-provider-redshift/internal/static"
+                      }
+                    ],
+                    "schema_definition": "stringvalidator.NoneOfCaseInsensitive(static.ReservedWords...)"
+                  }
+                },
+                {
+                  "custom": {
+                    "imports": [
+                      {
+                        "path": "github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+                      },
+                      {
+                        "path": "terraform-provider-redshift/internal/static"
+                      }
+                    ],
+                    "schema_definition": "stringvalidator.NoneOfCaseInsensitive(static.SystemColumnNames...)"
+                  }
+                },
+                {
+                  "custom": {
+                    "imports": [
+                      {
+                        "path": "github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+                      },
+                      {
+                        "path": "terraform-provider-redshift/internal/static"
+                      }
+                    ],
+                    "schema_definition": "stringvalidator.RegexMatches(static.IdentifierValidCharacters, `must begin with an ASCII single-byte alphabetic character or underscore character, Subsequent characters can be ASCII single-byte alphanumeric characters, underscores, or dollar signs.`)"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "name": "password",
+            "string": {
+              "description": "Sets the user's password. By default, users can change their own passwords, unless the password is disabled. To disable a user's password, omit a value. When a user's password is disabled, the password is deleted from the system and the user can log on only using temporary AWS Identity and Access Management (IAM) user credentials. For more information, see Using IAM Authentication to Generate Database User Credentials.",
+              "computed_optional_required": "optional",
+              "sensitive": true
+            }
+          },
+          {
+            "name": "createdb",
+            "bool": {
+              "description": "The CREATEDB (true) option allows the new user to create databases. The default is NOCREATEDB (false).",
+              "computed_optional_required": "computed_optional",
+              "default": {
+                "static": false
+              }
+            }
+          },
+          {
+            "name": "createuser",
+            "bool": {
+              "description": "The CREATEUSER (true) option creates a superuser with all database privileges, including CREATE USER. The default is NOCREATEUSER (false). For more information, see superuser.",
+              "computed_optional_required": "computed_optional",
+              "default": {
+                "static": false
+              }
+            }
+          },
+          {
+            "name": "syslog_access",
+            "string": {
+              "description": "A clause that specifies the level of access the user has to the Amazon Redshift system tables and views. If RESTRICTED is specified, the user can see only the rows generated by that user in user-visible system tables and views. The default is RESTRICTED. If UNRESTRICTED is specified, the user can see all rows in user-visible system tables and views, including rows generated by another user. UNRESTRICTED doesn't give a regular user access to superuser-visible tables. Only superusers can see superuser-visible tables.",
+              "computed_optional_required": "computed_optional",
+              "default": {
+                "static": "RESTRICTED"
+              },
+              "validators": [
+                {
+                  "custom": {
+                    "imports": [
+                      {
+                        "path": "github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+                      }
+                    ],
+                    "schema_definition": "stringvalidator.OneOf(`RESTRICTED`, `UNRESTRICTED`)"
+                  }
+                }
+              ]              
+            }
+          },
+          {
+            "name": "connection_limit",
+            "string": {
+              "description": "The maximum number of database connections the user is permitted to have open concurrently. The limit isn't enforced for superusers. Use the UNLIMITED keyword to permit the maximum number of concurrent connections. A limit on the number of connections for each database might also apply. For more information, see CREATE DATABASE. The default is UNLIMITED.",
+              "computed_optional_required": "computed_optional",
+              "default": {
+                "static": "UNLIMITED"
+              },
+              "validators": [
+                {
+                  "custom": {
+                    "imports": [
+                      {
+                        "path": "github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+                      },
+                      {
+                        "path": "regexp"
+                      }
+                    ],
+                    "schema_definition": "stringvalidator.Any( stringvalidator.RegexMatches(regexp.MustCompile(`^[1-9]+[0-9]*$`), `must be a positive non-zero value`), stringvalidator.OneOfCaseInsensitive(`UNLIMITED`), )"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "name": "valid_until",
+            "string": {
+              "computed_optional_required": "computed_optional"
+            }
+          },
+          {
+            "name": "session_timeout",
+            "int64": {
+              "description": "The maximum time in seconds that a session remains inactive or idle. The range is 60 seconds (one minute) to 1,728,000 seconds (20 days). If no session timeout is set for the user, the cluster setting applies. For more information, see Quotas and limits in Amazon Redshift in the Amazon Redshift Management Guide.",
+              "computed_optional_required": "computed_optional",
+              "default": {
+                "static": 0
+              },              
+              "validators": [
+                {
+                  "custom": {
+                    "imports": [
+                      {
+                        "path": "github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
+                      }
+                    ],
+                    "schema_definition": "int64validator.Between(60, 172800)"
+                  }
+                }
+              ]
+            }          
+          },
+          {
+            "name": "external_id",
+            "string": {
+              "description": "The identifier for the user, which is associated with an identity provider. The user must have their password disabled. For more information, see Native identity provider (IdP) federation for Amazon Redshift.",
+              "computed_optional_required": "optional"
+            }          
+          }
+        ]
+      }
+    }
+  ],
+  "version": "0.1"
+}
+
+do not generate until validate the hand changes are correct
