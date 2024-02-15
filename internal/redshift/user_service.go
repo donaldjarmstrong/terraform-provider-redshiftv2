@@ -149,6 +149,7 @@ func (s *UserService) CreateUser(args CreateUserDDLParams) (*User, error) {
 			{{if gt .SessionTimeout 0}}SESSION TIMEOUT {{.SessionTimeout}}{{end}}
 			{{if .ExternalId}}EXTERNALID '{{.ExternalId}}' {{end}}
 	`
+	name := args.Name // save this unsanitized for lookup later
 	args.Name = pgx.Identifier{args.Name}.Sanitize()
 
 	ctx, cancel := context.WithTimeout(s.ctx, s.timeout)
@@ -174,9 +175,12 @@ func (s *UserService) CreateUser(args CreateUserDDLParams) (*User, error) {
 		return nil, fmt.Errorf("CreateUser: Failed to execute: %w", err)
 	}
 
-	user, err := getUserByName(args.Name, ctx, tx)
+	user, err := getUserByName(name, ctx, tx)
 	if err != nil {
 		return nil, fmt.Errorf("CreateUser: Failed to getUserByName: %w", err)
+	}
+	if user == nil {
+		return nil, fmt.Errorf("CreateUser: Could not find user with name '%s'", name)
 	}
 
 	err = tx.Commit(ctx)
