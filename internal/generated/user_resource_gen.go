@@ -4,10 +4,6 @@ package generated
 
 import (
 	"context"
-	"regexp"
-	"terraform-provider-redshift/internal/static"
-	"terraform-provider-redshift/internal/validators"
-
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
@@ -17,6 +13,9 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"regexp"
+	"terraform-provider-redshift/internal/static"
+	"terraform-provider-redshift/internal/validators"
 
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 )
@@ -50,20 +49,19 @@ func UserResourceSchema(ctx context.Context) schema.Schema {
 			},
 			"external_id": schema.StringAttribute{
 				Optional:            true,
-				// Computed:            true,
 				Description:         "The identifier for the user, which is associated with an identity provider. The user must have their password disabled. For more information, see Native identity provider (IdP) federation for Amazon Redshift.",
 				MarkdownDescription: "The identifier for the user, which is associated with an identity provider. The user must have their password disabled. For more information, see Native identity provider (IdP) federation for Amazon Redshift.",
 				PlanModifiers: []planmodifier.String{
-                    stringplanmodifier.UseStateForUnknown(),
-                },			
+					stringplanmodifier.UseStateForUnknown(),
+				},
 			},
 			"id": schema.StringAttribute{
 				Computed:            true,
 				Description:         "Built-in identifier",
 				MarkdownDescription: "Built-in identifier",
 				PlanModifiers: []planmodifier.String{
-                    stringplanmodifier.UseStateForUnknown(),
-                },
+					stringplanmodifier.UseStateForUnknown(),
+				},
 			},
 			"name": schema.StringAttribute{
 				Required:            true,
@@ -73,8 +71,8 @@ func UserResourceSchema(ctx context.Context) schema.Schema {
 					stringvalidator.NoneOfCaseInsensitive(`public`),
 					stringvalidator.UTF8LengthBetween(1, 127),
 					stringvalidator.NoneOfCaseInsensitive(static.ReservedWords...),
-				// 	stringvalidator.NoneOfCaseInsensitive(static.SystemColumnNames...),
-				// 	stringvalidator.RegexMatches(static.IdentifierValidCharacters, `must begin with an ASCII single-byte alphabetic character or underscore character, Subsequent characters can be ASCII single-byte alphanumeric characters, underscores, or dollar signs.`),
+					stringvalidator.NoneOfCaseInsensitive(static.SystemColumnNames...),
+					stringvalidator.RegexMatches(static.IdentifierValidCharacters, `must begin with an ASCII single-byte alphabetic character or underscore character, Subsequent characters can be ASCII single-byte alphanumeric characters, underscores, or dollar signs.`),
 				},
 			},
 			"password": schema.StringAttribute{
@@ -86,8 +84,8 @@ func UserResourceSchema(ctx context.Context) schema.Schema {
 			"session_timeout": schema.Int64Attribute{
 				Optional:            true,
 				Computed:            true,
-				Description:         "The maximum time in seconds that a session remains inactive or idle. The range is 60 seconds (one minute) to 1,728,000 seconds (20 days). If no session timeout is set for the user, the cluster setting applies. For more information, see Quotas and limits in Amazon Redshift in the Amazon Redshift Management Guide.",
-				MarkdownDescription: "The maximum time in seconds that a session remains inactive or idle. The range is 60 seconds (one minute) to 1,728,000 seconds (20 days). If no session timeout is set for the user, the cluster setting applies. For more information, see Quotas and limits in Amazon Redshift in the Amazon Redshift Management Guide.",
+				Description:         "The maximum time in seconds that a session remains inactive or idle. The range is 60 seconds (one minute) to 1,728,000 seconds (20 days), or 0 to not set a timeout. If no session timeout is set for the user, the cluster setting applies. For more information, see Quotas and limits in Amazon Redshift in the Amazon Redshift Management Guide.",
+				MarkdownDescription: "The maximum time in seconds that a session remains inactive or idle. The range is 60 seconds (one minute) to 1,728,000 seconds (20 days), or 0 to not set a timeout. If no session timeout is set for the user, the cluster setting applies. For more information, see Quotas and limits in Amazon Redshift in the Amazon Redshift Management Guide.",
 				Validators: []validator.Int64{
 					int64validator.Between(60, 172800),
 				},
@@ -108,13 +106,10 @@ func UserResourceSchema(ctx context.Context) schema.Schema {
 				Optional:            true,
 				Computed:            true,
 				Description:         "The VALID UNTIL option sets an absolute time after which the user's password is no longer valid. By default the password has no time limit ('infinity').",
-				MarkdownDescription: "The VALID UNTIL option sets an absolute time after which the user's password is no longer valid. By default the password has no time limit ('infinity').",		
+				MarkdownDescription: "The VALID UNTIL option sets an absolute time after which the user's password is no longer valid. By default the password has no time limit ('infinity').",
 				Validators: []validator.String{
-					stringvalidator.Any(
-						stringvalidator.OneOf("infinity"),
-						validators.Iso8601Validator(),
-					),
-				},		
+					stringvalidator.Any(stringvalidator.OneOf(`infinity`), validators.Iso8601Validator()),
+				},
 				Default: stringdefault.StaticString("infinity"),
 			},
 		},
@@ -122,14 +117,14 @@ func UserResourceSchema(ctx context.Context) schema.Schema {
 }
 
 type UserModel struct {
-	ConnectionLimit types.String      `tfsdk:"connection_limit"`
-	Createdb        types.Bool        `tfsdk:"createdb"`
-	Createuser      types.Bool        `tfsdk:"createuser"`
-	ExternalId      types.String      `tfsdk:"external_id"`
-	Id              types.String      `tfsdk:"id"`
-	Name            types.String      `tfsdk:"name"`
-	Password        types.String      `tfsdk:"password"`
-	SessionTimeout  types.Int64       `tfsdk:"session_timeout"`
-	SyslogAccess    types.String      `tfsdk:"syslog_access"`
+	ConnectionLimit types.String `tfsdk:"connection_limit"`
+	Createdb        types.Bool   `tfsdk:"createdb"`
+	Createuser      types.Bool   `tfsdk:"createuser"`
+	ExternalId      types.String `tfsdk:"external_id"`
+	Id              types.String `tfsdk:"id"`
+	Name            types.String `tfsdk:"name"`
+	Password        types.String `tfsdk:"password"`
+	SessionTimeout  types.Int64  `tfsdk:"session_timeout"`
+	SyslogAccess    types.String `tfsdk:"syslog_access"`
 	ValidUntil      types.String `tfsdk:"valid_until"`
 }

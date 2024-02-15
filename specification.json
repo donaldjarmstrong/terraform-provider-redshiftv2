@@ -81,6 +81,32 @@
               }
             ]
           }
+        },
+        {
+          "name": "application_name",
+          "string": {
+            "description": "The name of the application.  The default value is terraform-provider-redshift",
+            "optional_required": "optional"
+          }
+        },
+        {
+          "name": "timeout",
+          "int64": {
+            "description": "Timeout in seconds. Maximum time to wait while connecting and query execution. Zero or unspecified means wait indefinitely.",
+            "optional_required": "optional",
+            "validators": [
+              {
+                "custom": {
+                  "imports": [
+                    {
+                      "path": "github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
+                    }
+                  ],
+                  "schema_definition": "int64validator.AtLeast(0)"
+                }
+              }
+            ]
+          }
         }
       ]
     }
@@ -88,27 +114,27 @@
   "resources": [
     {
       "name": "user",
-      "description": "in group is not implemented",
+      "description": "Creates a new database user. Database users can retrieve data, run commands, and perform other actions in a database, depending on their privileges and roles.",
       "schema": {
         "attributes": [
           {
             "name": "id",
             "string": {
               "description": "Built-in identifier",
-              "computed_optional_required": "computed"
-            },
-            "plan_modifiers": [
-              {
-                "custom": {
-                  "imports": [
-                    {
-                      "path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
-                    }
-                  ],
-                  "schema_definition": "stringplanmodifier.UseStateForUnknown()"
+              "computed_optional_required": "computed",
+              "plan_modifiers": [
+                {
+                  "custom": {
+                    "imports": [
+                      {
+                        "path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+                      }
+                    ],
+                    "schema_definition": "stringplanmodifier.UseStateForUnknown()"
+                  }
                 }
-              }
-            ]            
+              ]
+            }
           },
           {
             "name": "name",
@@ -224,8 +250,18 @@
                     ],
                     "schema_definition": "stringvalidator.OneOf(`RESTRICTED`, `UNRESTRICTED`)"
                   }
+                },
+                {
+                  "custom": {
+                    "imports": [
+                      {
+                        "path": "terraform-provider-redshift/internal/validators"
+                      }
+                    ],
+                    "schema_definition": "validators.SyslogAccessValidator()"
+                  }
                 }
-              ]              
+              ]
             }
           },
           {
@@ -256,17 +292,36 @@
           {
             "name": "valid_until",
             "string": {
-              "computed_optional_required": "computed_optional"
+              "computed_optional_required": "computed_optional",
+              "description": "The VALID UNTIL option sets an absolute time after which the user's password is no longer valid. By default the password has no time limit ('infinity').",
+              "default": {
+                "static": "infinity"
+              },
+              "validators": [
+                {
+                  "custom": {
+                    "imports": [
+                      {
+                        "path": "github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+                      },
+                      {
+                        "path": "terraform-provider-redshift/internal/validators"
+                      }                      
+                    ],
+                    "schema_definition": "stringvalidator.Any( stringvalidator.OneOf(`infinity`), validators.Iso8601Validator() )"
+                  }
+                }
+              ]
             }
           },
           {
             "name": "session_timeout",
             "int64": {
-              "description": "The maximum time in seconds that a session remains inactive or idle. The range is 60 seconds (one minute) to 1,728,000 seconds (20 days). If no session timeout is set for the user, the cluster setting applies. For more information, see Quotas and limits in Amazon Redshift in the Amazon Redshift Management Guide.",
+              "description": "The maximum time in seconds that a session remains inactive or idle. The range is 60 seconds (one minute) to 1,728,000 seconds (20 days), or 0 to not set a timeout. If no session timeout is set for the user, the cluster setting applies. For more information, see Quotas and limits in Amazon Redshift in the Amazon Redshift Management Guide.",
               "computed_optional_required": "computed_optional",
               "default": {
                 "static": 0
-              },              
+              },
               "validators": [
                 {
                   "custom": {
@@ -279,14 +334,26 @@
                   }
                 }
               ]
-            }          
+            }
           },
           {
             "name": "external_id",
             "string": {
               "description": "The identifier for the user, which is associated with an identity provider. The user must have their password disabled. For more information, see Native identity provider (IdP) federation for Amazon Redshift.",
-              "computed_optional_required": "optional"
-            }          
+              "computed_optional_required": "optional",
+              "plan_modifiers": [
+                {
+                  "custom": {
+                    "imports": [
+                      {
+                        "path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+                      }
+                    ],
+                    "schema_definition": "stringplanmodifier.UseStateForUnknown()"
+                  }
+                }
+              ]
+            }
           }
         ]
       }
@@ -294,5 +361,3 @@
   ],
   "version": "0.1"
 }
-
-do not generate until validate the hand changes are correct

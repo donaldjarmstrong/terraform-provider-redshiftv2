@@ -26,7 +26,7 @@ var SystemColumnNames = []string{
 }
 
 // Begin with an ASCII single-byte alphabetic character or underscore character.
-// Subsequent characters can be ASCII single-byte alphanumeric characters, underscores, or dollar signs
+// Subsequent characters can be ASCII single-byte alphanumeric characters, underscores, or dollar signs.
 var IdentifierValidCharacters = regexp.MustCompile(`^[a-zA-Z_][a-zA-Z0-9_\$]*$`)
 
 // The following is a list of Amazon Redshift reserved words. You can use the reserved words with delimited

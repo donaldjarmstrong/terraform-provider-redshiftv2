@@ -66,6 +66,15 @@ func (r *createUserResource) Create(ctx context.Context, req resource.CreateRequ
 	}
 
 	svc, err := redshift.NewUserService(ctx, r.ConnCfg)
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Failed to execute NewUserService",
+			"An unexpected error occurred when calling NewUserService. "+
+				"If the error is not clear, please contact the provider developers.\n\n"+
+				"Unable to Create: "+err.Error(),
+		)
+		return
+	}
 
 	user, err := svc.CreateUser(createDDL)
 	if err != nil {
@@ -101,6 +110,15 @@ func (r *createUserResource) Read(ctx context.Context, req resource.ReadRequest,
 	}
 
 	svc, err := redshift.NewUserService(ctx, r.ConnCfg)
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Failed to execute NewUserService",
+			"An unexpected error occurred when calling NewUserService. "+
+				"If the error is not clear, please contact the provider developers.\n\n"+
+				"Unable to Read: "+err.Error(),
+		)
+		return
+	}
 
 	svv_data, err := svc.FindUser(state.Id.ValueString())
 	if err != nil {
@@ -202,6 +220,15 @@ func (r *createUserResource) Update(ctx context.Context, req resource.UpdateRequ
 	}
 
 	svc, err := redshift.NewUserService(ctx, r.ConnCfg)
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Failed to execute NewUserService",
+			"An unexpected error occurred when calling NewUserService. "+
+				"If the error is not clear, please contact the provider developers.\n\n"+
+				"Unable to Update: "+err.Error(),
+		)
+		return
+	}
 
 	err = svc.AlterUser(alterUserDDL)
 	if err != nil {
@@ -234,6 +261,15 @@ func (r *createUserResource) Delete(ctx context.Context, req resource.DeleteRequ
 	}
 
 	svc, err := redshift.NewUserService(ctx, r.ConnCfg)
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Failed to execute NewUserService",
+			"An unexpected error occurred when calling NewUserService. "+
+				"If the error is not clear, please contact the provider developers.\n\n"+
+				"Unable to Delete: "+err.Error(),
+		)
+		return
+	}
 
 	err = svc.DropUser(state.Name.ValueString())
 	if err != nil {

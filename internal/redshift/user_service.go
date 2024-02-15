@@ -137,7 +137,7 @@ type CreateUserDDLParams struct {
 	ExternalId      *string
 }
 
-func (s *UserService) CreateUser(ddl CreateUserDDLParams) (*User, error) {
+func (s *UserService) CreateUser(args CreateUserDDLParams) (*User, error) {
 	t := `
 		CREATE USER {{.Name}}
 		    PASSWORD {{if .Password}}'{{.Password}}'{{else}}DISABLE{{end}}
@@ -149,8 +149,8 @@ func (s *UserService) CreateUser(ddl CreateUserDDLParams) (*User, error) {
 			{{if gt .SessionTimeout 0}}SESSION TIMEOUT {{.SessionTimeout}}{{end}}
 			{{if .ExternalId}}EXTERNALID '{{.ExternalId}}' {{end}}
 	`
-	args := CreateUserDDLParams(ddl)
-	args.Name = pgx.Identifier{ddl.Name}.Sanitize()
+	name := args.Name // save this unsanitized for lookup later
+	args.Name = pgx.Identifier{args.Name}.Sanitize()
 
 	ctx, cancel := context.WithTimeout(s.ctx, s.timeout)
 	defer cancel()
@@ -175,9 +175,12 @@ func (s *UserService) CreateUser(ddl CreateUserDDLParams) (*User, error) {
 		return nil, fmt.Errorf("CreateUser: Failed to execute: %w", err)
 	}
 
-	user, err := getUserByName(ddl.Name, ctx, tx)
+	user, err := getUserByName(name, ctx, tx)
 	if err != nil {
 		return nil, fmt.Errorf("CreateUser: Failed to getUserByName: %w", err)
+	}
+	if user == nil {
+		return nil, fmt.Errorf("CreateUser: Could not find user with name '%s'", name)
 	}
 
 	err = tx.Commit(ctx)
@@ -201,9 +204,8 @@ type AlterUserDDLParams struct {
 	ExternalId      *string
 }
 
-func (s *UserService) AlterUser(ddl AlterUserDDLParams) error {
-	args := AlterUserDDLParams(ddl)
-	args.Name = pgx.Identifier{ddl.Name}.Sanitize()
+func (s *UserService) AlterUser(args AlterUserDDLParams) error {
+	args.Name = pgx.Identifier{args.Name}.Sanitize()
 
 	ctx, cancel := context.WithTimeout(s.ctx, s.timeout)
 	defer cancel()
@@ -219,8 +221,8 @@ func (s *UserService) AlterUser(ddl AlterUserDDLParams) error {
 	}
 
 	// Undocumented, redshift must perform a rename without other options; it is a syntax error otherwise
-	if ddl.RenameTo != nil {
-		rn := pgx.Identifier{*ddl.RenameTo}.Sanitize()
+	if args.RenameTo != nil {
+		rn := pgx.Identifier{*args.RenameTo}.Sanitize()
 		args.RenameTo = &rn
 
 		rename := `
@@ -288,7 +290,7 @@ func getUserValidUntil(id string, ctx context.Context, tx pgx.Tx) (*pg_user_info
 	return &pg_user_info, nil
 }
 
-// hidden from outside the package, expect that callers use the ById variant
+// hidden from outside the package, expect that callers use the ById variant.
 func getUserByName(name string, ctx context.Context, tx pgx.Tx) (*User, error) {
 	sql := `
 	SELECT svv.connection_limit,

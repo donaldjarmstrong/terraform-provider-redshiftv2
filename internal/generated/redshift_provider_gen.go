@@ -15,6 +15,11 @@ import (
 func RedshiftProviderSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
 		Attributes: map[string]schema.Attribute{
+			"application_name": schema.StringAttribute{
+				Optional:            true,
+				Description:         "The name of the application.  The default value is terraform-provider-redshift",
+				MarkdownDescription: "The name of the application.  The default value is terraform-provider-redshift",
+			},
 			"dbname": schema.StringAttribute{
 				Required:            true,
 				Description:         "dbname",
@@ -50,35 +55,30 @@ func RedshiftProviderSchema(ctx context.Context) schema.Schema {
 					stringvalidator.OneOf("disable", "allow", "prefer", "require", "verify-ca", "verify-full"),
 				},
 			},
-			"username": schema.StringAttribute{
-				Required:            true,
-				Description:         "Username",
-				MarkdownDescription: "Username",
-			},
 			"timeout": schema.Int64Attribute{
 				Optional:            true,
-				Description:         "Timeout in seconds. Maximum time to wait while connecting and query execution in seconds. Zero or not specified means wait indefinitely.",
-				MarkdownDescription: "Timeout in seconds. Maximum time to wait while connecting and query execution in seconds. Zero or not specified means wait indefinitely.",
+				Description:         "Timeout in seconds. Maximum time to wait while connecting and query execution. Zero or unspecified means wait indefinitely.",
+				MarkdownDescription: "Timeout in seconds. Maximum time to wait while connecting and query execution. Zero or unspecified means wait indefinitely.",
 				Validators: []validator.Int64{
 					int64validator.AtLeast(0),
 				},
 			},
-			"application_name": schema.StringAttribute{
-				Optional:            true,
-				Description:         "The name of the application",
-				MarkdownDescription: "The name of the application",
+			"username": schema.StringAttribute{
+				Required:            true,
+				Description:         "username",
+				MarkdownDescription: "username",
 			},
 		},
 	}
 }
 
 type RedshiftModel struct {
-	Dbname   types.String `tfsdk:"dbname"`
-	Host     types.String `tfsdk:"host"`
-	Password types.String `tfsdk:"password"`
-	Port     types.Int64  `tfsdk:"port"`
-	Sslmode  types.String `tfsdk:"sslmode"`
-	Username types.String `tfsdk:"username"`
-	Timeout  types.Int64  `tfsdk:"timeout"`
 	ApplicationName types.String `tfsdk:"application_name"`
+	Dbname          types.String `tfsdk:"dbname"`
+	Host            types.String `tfsdk:"host"`
+	Password        types.String `tfsdk:"password"`
+	Port            types.Int64  `tfsdk:"port"`
+	Sslmode         types.String `tfsdk:"sslmode"`
+	Timeout         types.Int64  `tfsdk:"timeout"`
+	Username        types.String `tfsdk:"username"`
 }
