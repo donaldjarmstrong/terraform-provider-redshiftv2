@@ -37,13 +37,13 @@ func (v iso86601Validator) ValidateString(ctx context.Context, req validator.Str
 		resp.Diagnostics.Append(validatordiag.InvalidAttributeValueDiagnostic(
 			req.Path,
 			v.Description(ctx),
-			fmt.Sprintf("%s", req.ConfigValue.ValueString()),
+			req.ConfigValue.ValueString(),
 		))
 	}
 }
 
 // iso86601Validator returns a validator which ensures that any configured
-// attribute value can be parsed into a time.Time from a layout of time.DateTime
+// attribute value can be parsed into a time.Time from a layout of time.DateTime.
 func Iso8601Validator() validator.String {
 	return iso86601Validator{
 		layout: time.DateTime,

@@ -51,7 +51,7 @@ func (v syslogAccessValidator) ValidateString(ctx context.Context, req validator
 			resp.Diagnostics.Append(validatordiag.InvalidAttributeValueDiagnostic(
 				req.Path,
 				v.Description(ctx),
-				fmt.Sprintf("%s", req.ConfigValue.ValueString()),
+				req.ConfigValue.ValueString(),
 			))
 		}
 	}
