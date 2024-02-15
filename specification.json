@@ -81,6 +81,32 @@
               }
             ]
           }
+        },
+        {
+          "name": "application_name",
+          "string": {
+            "description": "The name of the application.  The default value is terraform-provider-redshift",
+            "optional_required": "optional"
+          }
+        },
+        {
+          "name": "timeout",
+          "int64": {
+            "description": "Timeout in seconds. Maximum time to wait while connecting and query execution. Zero or unspecified means wait indefinitely.",
+            "optional_required": "optional",
+            "validators": [
+              {
+                "custom": {
+                  "imports": [
+                    {
+                      "path": "github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
+                    }
+                  ],
+                  "schema_definition": "int64validator.AtLeast(0)"
+                }
+              }
+            ]
+          }
         }
       ]
     }
@@ -95,20 +121,20 @@
             "name": "id",
             "string": {
               "description": "Built-in identifier",
-              "computed_optional_required": "computed"
-            },
-            "plan_modifiers": [
-              {
-                "custom": {
-                  "imports": [
-                    {
-                      "path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
-                    }
-                  ],
-                  "schema_definition": "stringplanmodifier.UseStateForUnknown()"
+              "computed_optional_required": "computed",
+              "plan_modifiers": [
+                {
+                  "custom": {
+                    "imports": [
+                      {
+                        "path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+                      }
+                    ],
+                    "schema_definition": "stringplanmodifier.UseStateForUnknown()"
+                  }
                 }
-              }
-            ]            
+              ]
+            }
           },
           {
             "name": "name",
@@ -225,7 +251,7 @@
                     "schema_definition": "stringvalidator.OneOf(`RESTRICTED`, `UNRESTRICTED`)"
                   }
                 }
-              ]              
+              ]
             }
           },
           {
@@ -266,7 +292,7 @@
               "computed_optional_required": "computed_optional",
               "default": {
                 "static": 0
-              },              
+              },
               "validators": [
                 {
                   "custom": {
@@ -279,14 +305,14 @@
                   }
                 }
               ]
-            }          
+            }
           },
           {
             "name": "external_id",
             "string": {
               "description": "The identifier for the user, which is associated with an identity provider. The user must have their password disabled. For more information, see Native identity provider (IdP) federation for Amazon Redshift.",
               "computed_optional_required": "optional"
-            }          
+            }
           }
         ]
       }
@@ -294,5 +320,3 @@
   ],
   "version": "0.1"
 }
-
-do not generate until validate the hand changes are correct
