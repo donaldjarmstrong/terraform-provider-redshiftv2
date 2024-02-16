@@ -187,19 +187,6 @@
                     ],
                     "schema_definition": "stringvalidator.NoneOfCaseInsensitive(static.SystemColumnNames...)"
                   }
-                },
-                {
-                  "custom": {
-                    "imports": [
-                      {
-                        "path": "github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
-                      },
-                      {
-                        "path": "terraform-provider-redshift/internal/static"
-                      }
-                    ],
-                    "schema_definition": "stringvalidator.RegexMatches(static.IdentifierValidCharacters, `must begin with an ASCII single-byte alphabetic character or underscore character, Subsequent characters can be ASCII single-byte alphanumeric characters, underscores, or dollar signs.`)"
-                  }
                 }
               ]
             }
@@ -355,6 +342,94 @@
               ]
             }
           }
+        ]
+      }
+    },
+    {
+      "name": "role",
+      "description": "Creates a new custom role that is a collection of permissions. For a list of Amazon Redshift system-defined roles, see Amazon Redshift system-defined roles.",
+      "schema": {
+        "attributes": [
+          {
+            "name": "id",
+            "string": {
+              "description": "Built-in identifier",
+              "computed_optional_required": "computed",
+              "plan_modifiers": [
+                {
+                  "custom": {
+                    "imports": [
+                      {
+                        "path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+                      }
+                    ],
+                    "schema_definition": "stringplanmodifier.UseStateForUnknown()"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "name": "name",
+            "string": {
+              "description": "The name of the role. The role name must be unique and can't be the same as any user names. A role name can't be a reserved word.",
+              "computed_optional_required": "required",
+              "validators": [
+                {
+                  "custom": {
+                    "imports": [
+                      {
+                        "path": "github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+                      }
+                    ],
+                    "schema_definition": "stringvalidator.NoneOfCaseInsensitive(`public`)"
+                  }
+                },
+                {
+                  "custom": {
+                    "imports": [
+                      {
+                        "path": "github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+                      }
+                    ],
+                    "schema_definition": "stringvalidator.UTF8LengthBetween(1,127)"
+                  }
+                },
+                {
+                  "custom": {
+                    "imports": [
+                      {
+                        "path": "github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+                      },
+                      {
+                        "path": "terraform-provider-redshift/internal/static"
+                      }
+                    ],
+                    "schema_definition": "stringvalidator.NoneOfCaseInsensitive(static.ReservedWords...)"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "name": "external_id",
+            "string": {
+              "description": "The identifier for the role, which is associated with an identity provider. For more information, see Native identity provider (IdP) federation for Amazon Redshift.",
+              "computed_optional_required": "optional",
+              "plan_modifiers": [
+                {
+                  "custom": {
+                    "imports": [
+                      {
+                        "path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+                      }
+                    ],
+                    "schema_definition": "stringplanmodifier.UseStateForUnknown()"
+                  }
+                }
+              ]
+            }
+          }          
         ]
       }
     }

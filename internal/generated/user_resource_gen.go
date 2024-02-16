@@ -72,7 +72,6 @@ func UserResourceSchema(ctx context.Context) schema.Schema {
 					stringvalidator.UTF8LengthBetween(1, 127),
 					stringvalidator.NoneOfCaseInsensitive(static.ReservedWords...),
 					stringvalidator.NoneOfCaseInsensitive(static.SystemColumnNames...),
-					stringvalidator.RegexMatches(static.IdentifierValidCharacters, `must begin with an ASCII single-byte alphabetic character or underscore character, Subsequent characters can be ASCII single-byte alphanumeric characters, underscores, or dollar signs.`),
 				},
 			},
 			"password": schema.StringAttribute{

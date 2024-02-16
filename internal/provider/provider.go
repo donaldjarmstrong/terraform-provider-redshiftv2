@@ -114,7 +114,8 @@ func (p *RedshiftProvider) Configure(ctx context.Context, req provider.Configure
 
 func (p *RedshiftProvider) Resources(ctx context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
-		resources.NewCreateUserResource,
+		resources.NewUserResource,
+		resources.NewRoleResource,
 	}
 }
 
@@ -147,7 +148,7 @@ func (p RedshiftProvider) ValidateConfig(ctx context.Context, req provider.Valid
 		return
 	}
 
-	if data.Host.IsNull() || data.Port.IsNull() {
+	if data.Host.IsUnknown() || data.Port.IsUnknown() {
 		return
 	}
 }
