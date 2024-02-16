@@ -148,7 +148,7 @@ func (p RedshiftProvider) ValidateConfig(ctx context.Context, req provider.Valid
 		return
 	}
 
-	if data.Host.IsNull() || data.Port.IsNull() {
+	if data.Host.IsUnknown() || data.Port.IsUnknown() {
 		return
 	}
 }
