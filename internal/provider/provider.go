@@ -114,7 +114,8 @@ func (p *RedshiftProvider) Configure(ctx context.Context, req provider.Configure
 
 func (p *RedshiftProvider) Resources(ctx context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
-		resources.NewCreateUserResource,
+		resources.NewUserResource,
+		resources.NewRoleResource,
 	}
 }
 

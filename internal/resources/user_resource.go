@@ -16,29 +16,29 @@ import (
 
 // Ensure the implementation satisfies the expected interfaces.
 var (
-	_ resource.Resource                   = &createUserResource{}
-	_ resource.ResourceWithConfigure      = &createUserResource{}
-	_ resource.ResourceWithValidateConfig = &createUserResource{}
-	_ resource.ResourceWithImportState    = &createUserResource{}
+	_ resource.Resource                   = &userResource{}
+	_ resource.ResourceWithConfigure      = &userResource{}
+	_ resource.ResourceWithValidateConfig = &userResource{}
+	_ resource.ResourceWithImportState    = &userResource{}
 )
 
-func NewCreateUserResource() resource.Resource {
-	return &createUserResource{}
+func NewUserResource() resource.Resource {
+	return &userResource{}
 }
 
-type createUserResource struct {
+type userResource struct {
 	ConnCfg *pgx.ConnConfig
 }
 
-func (r *createUserResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "_create_user"
+func (r *userResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
+	resp.TypeName = req.ProviderTypeName + "_user"
 }
 
-func (r *createUserResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
+func (r *userResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = generated.UserResourceSchema(ctx)
 }
 
-func (r *createUserResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
+func (r *userResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	var plan generated.UserModel
 
 	// Read Terraform plan data into the model
@@ -48,13 +48,12 @@ func (r *createUserResource) Create(ctx context.Context, req resource.CreateRequ
 	}
 
 	r.ConnCfg.Tracer = &tracelog.TraceLog{
-		Logger:   static.NewLogger(ctx, "create_user_resource.Create"),
+		Logger:   static.NewLogger(ctx, "user_resource.Create"),
 		LogLevel: tracelog.LogLevelTrace,
 	}
 
 	createDDL := redshift.CreateUserDDLParams{
-		Name: plan.Name.ValueString(),
-		// Name:            pgx.Identifier{plan.Name.ValueString()}.Sanitize(),
+		Name:            plan.Name.ValueString(),
 		Password:        plan.Password.ValueStringPointer(),
 		CreateDb:        plan.Createdb.ValueBool(),
 		CreateUser:      plan.Createuser.ValueBool(),
@@ -95,7 +94,7 @@ func (r *createUserResource) Create(ctx context.Context, req resource.CreateRequ
 	resp.Diagnostics.Append(resp.State.Set(ctx, &plan)...)
 }
 
-func (r *createUserResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
+func (r *userResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
 	var state generated.UserModel
 
 	// Read Terraform prior state data into the model
@@ -105,7 +104,7 @@ func (r *createUserResource) Read(ctx context.Context, req resource.ReadRequest,
 	}
 
 	r.ConnCfg.Tracer = &tracelog.TraceLog{
-		Logger:   static.NewLogger(ctx, "create_user_resource.Read"),
+		Logger:   static.NewLogger(ctx, "user_resource.Read"),
 		LogLevel: tracelog.LogLevelTrace,
 	}
 
@@ -140,8 +139,6 @@ func (r *createUserResource) Read(ctx context.Context, req resource.ReadRequest,
 	state.SyslogAccess = types.StringValue(svv_data.SyslogAccess)
 	state.ValidUntil = types.StringValue(svv_data.ValidUntil)
 
-	state.ExternalId = types.StringPointerValue(svv_data.ExternalId)
-
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &state)...)
 	if resp.Diagnostics.HasError() {
@@ -149,7 +146,7 @@ func (r *createUserResource) Read(ctx context.Context, req resource.ReadRequest,
 	}
 }
 
-func (r *createUserResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
+func (r *userResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 	var plan, state generated.UserModel
 
 	// Read Terraform plan data into the model
@@ -161,7 +158,7 @@ func (r *createUserResource) Update(ctx context.Context, req resource.UpdateRequ
 	}
 
 	r.ConnCfg.Tracer = &tracelog.TraceLog{
-		Logger:   static.NewLogger(ctx, "create_user_resource.Update"),
+		Logger:   static.NewLogger(ctx, "user_resource.Update"),
 		LogLevel: tracelog.LogLevelTrace,
 	}
 
@@ -245,7 +242,7 @@ func (r *createUserResource) Update(ctx context.Context, req resource.UpdateRequ
 	resp.Diagnostics.Append(resp.State.Set(ctx, &plan)...)
 }
 
-func (r *createUserResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
+func (r *userResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
 	var state generated.UserModel
 
 	// Read Terraform prior state into the model
@@ -256,7 +253,7 @@ func (r *createUserResource) Delete(ctx context.Context, req resource.DeleteRequ
 	}
 
 	r.ConnCfg.Tracer = &tracelog.TraceLog{
-		Logger:   static.NewLogger(ctx, "create_user_resource.Delete"),
+		Logger:   static.NewLogger(ctx, "user_resource.Delete"),
 		LogLevel: tracelog.LogLevelTrace,
 	}
 
@@ -286,11 +283,11 @@ func (r *createUserResource) Delete(ctx context.Context, req resource.DeleteRequ
 	// the resource from state if there are no other errors
 }
 
-func (r *createUserResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+func (r *userResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
 	resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
 }
 
-func (r *createUserResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
+func (r *userResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
 	if req.ProviderData == nil {
 		return
 	}
@@ -308,7 +305,7 @@ func (r *createUserResource) Configure(ctx context.Context, req resource.Configu
 	r.ConnCfg = cfg
 }
 
-func (r *createUserResource) ValidateConfig(ctx context.Context, req resource.ValidateConfigRequest, resp *resource.ValidateConfigResponse) {
+func (r *userResource) ValidateConfig(ctx context.Context, req resource.ValidateConfigRequest, resp *resource.ValidateConfigResponse) {
 	var plan generated.UserModel
 
 	resp.Diagnostics.Append(req.Config.Get(ctx, &plan)...)
@@ -317,6 +314,3 @@ func (r *createUserResource) ValidateConfig(ctx context.Context, req resource.Va
 		return
 	}
 }
-
-// ogx retryable errors?
-// codegen back on track
