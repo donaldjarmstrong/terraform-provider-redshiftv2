@@ -1,4 +1,4 @@
-package static
+package helpers
 
 import "regexp"
 

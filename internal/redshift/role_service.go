@@ -3,7 +3,7 @@ package redshift
 import (
 	"context"
 	"fmt"
-	"terraform-provider-redshift/internal/static"
+	"terraform-provider-redshift/internal/helpers"
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-log/tflog"
@@ -137,7 +137,7 @@ func (s *RoleService) CreateRole(args CreateRoleDDLParams) (*Role, error) {
 		return nil, fmt.Errorf("CreateRole: Failed to begin transaction: %w", err)
 	}
 
-	sql, err := static.Merge(t, args)
+	sql, err := helpers.Merge(t, args)
 	if err != nil {
 		return nil, fmt.Errorf("CreateRole: Failed to merge template: %w", err)
 	}
@@ -196,7 +196,7 @@ func (s *RoleService) AlterRole(args AlterRoleDDLParams) error {
 			{{if .ExternalId}}EXTERNALID '{{.ExternalId}}' {{end}}
 		`
 
-	sql, err := static.Merge(t, args)
+	sql, err := helpers.Merge(t, args)
 	if err != nil {
 		return fmt.Errorf("AlterRole: failed to merge template: %w", err)
 	}

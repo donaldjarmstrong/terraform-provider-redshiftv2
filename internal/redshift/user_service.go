@@ -3,7 +3,7 @@ package redshift
 import (
 	"context"
 	"fmt"
-	"terraform-provider-redshift/internal/static"
+	"terraform-provider-redshift/internal/helpers"
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-log/tflog"
@@ -165,7 +165,7 @@ func (s *UserService) CreateUser(args CreateUserDDLParams) (*User, error) {
 		return nil, fmt.Errorf("CreateUser: Failed to begin transaction: %w", err)
 	}
 
-	sql, err := static.Merge(t, args)
+	sql, err := helpers.Merge(t, args)
 	if err != nil {
 		return nil, fmt.Errorf("CreateUser: Failed to merge template: %w", err)
 	}
@@ -228,7 +228,7 @@ func (s *UserService) AlterUser(args AlterUserDDLParams) error {
 		rename := `
 			ALTER USER {{.Name}} RENAME TO {{.RenameTo}}
 		`
-		sql, err := static.Merge(rename, args)
+		sql, err := helpers.Merge(rename, args)
 		if err != nil {
 			return fmt.Errorf("AlterUser: failed to merge rename template: %w", err)
 		}
@@ -251,7 +251,7 @@ func (s *UserService) AlterUser(args AlterUserDDLParams) error {
 			{{if .ExternalId}}EXTERNALID '{{.ExternalId}}' {{end}}
 		`
 
-	sql, err := static.Merge(t, args)
+	sql, err := helpers.Merge(t, args)
 	if err != nil {
 		return fmt.Errorf("AlterUser: failed to merge template: %w", err)
 	}

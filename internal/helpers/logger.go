@@ -1,5 +1,4 @@
-// Package zap provides a logger that writes to a go.uber.org/zap.Logger.
-package static
+package helpers
 
 import (
 	"context"

@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 	"terraform-provider-redshift/internal/generated"
+	"terraform-provider-redshift/internal/helpers"
 	"terraform-provider-redshift/internal/redshift"
-	"terraform-provider-redshift/internal/static"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -48,7 +48,7 @@ func (r *userResource) Create(ctx context.Context, req resource.CreateRequest, r
 	}
 
 	r.ConnCfg.Tracer = &tracelog.TraceLog{
-		Logger:   static.NewLogger(ctx, "user_resource.Create"),
+		Logger:   helpers.NewLogger(ctx, "user_resource.Create"),
 		LogLevel: tracelog.LogLevelTrace,
 	}
 
@@ -104,7 +104,7 @@ func (r *userResource) Read(ctx context.Context, req resource.ReadRequest, resp 
 	}
 
 	r.ConnCfg.Tracer = &tracelog.TraceLog{
-		Logger:   static.NewLogger(ctx, "user_resource.Read"),
+		Logger:   helpers.NewLogger(ctx, "user_resource.Read"),
 		LogLevel: tracelog.LogLevelTrace,
 	}
 
@@ -152,13 +152,12 @@ func (r *userResource) Update(ctx context.Context, req resource.UpdateRequest, r
 	// Read Terraform plan data into the model
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
 	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
-
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	r.ConnCfg.Tracer = &tracelog.TraceLog{
-		Logger:   static.NewLogger(ctx, "user_resource.Update"),
+		Logger:   helpers.NewLogger(ctx, "user_resource.Update"),
 		LogLevel: tracelog.LogLevelTrace,
 	}
 
@@ -173,17 +172,17 @@ func (r *userResource) Update(ctx context.Context, req resource.UpdateRequest, r
 
 	if !plan.Createdb.Equal(state.Createdb) {
 		if plan.Createdb.ValueBool() {
-			alterUserDDL.CreateDb = static.Pointer[bool](true)
+			alterUserDDL.CreateDb = helpers.Pointer[bool](true)
 		} else {
-			alterUserDDL.CreateDb = static.Pointer[bool](false)
+			alterUserDDL.CreateDb = helpers.Pointer[bool](false)
 		}
 	}
 
 	if !plan.Createuser.Equal(state.Createuser) {
 		if plan.Createuser.ValueBool() {
-			alterUserDDL.CreateUser = static.Pointer[bool](true)
+			alterUserDDL.CreateUser = helpers.Pointer[bool](true)
 		} else {
-			alterUserDDL.CreateUser = static.Pointer[bool](false)
+			alterUserDDL.CreateUser = helpers.Pointer[bool](false)
 		}
 	}
 
@@ -253,7 +252,7 @@ func (r *userResource) Delete(ctx context.Context, req resource.DeleteRequest, r
 	}
 
 	r.ConnCfg.Tracer = &tracelog.TraceLog{
-		Logger:   static.NewLogger(ctx, "user_resource.Delete"),
+		Logger:   helpers.NewLogger(ctx, "user_resource.Delete"),
 		LogLevel: tracelog.LogLevelTrace,
 	}
 

@@ -14,7 +14,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"regexp"
-	"terraform-provider-redshift/internal/static"
+	"terraform-provider-redshift/internal/helpers"
 	"terraform-provider-redshift/internal/validators"
 
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -70,8 +70,8 @@ func UserResourceSchema(ctx context.Context) schema.Schema {
 				Validators: []validator.String{
 					stringvalidator.NoneOfCaseInsensitive(`public`),
 					stringvalidator.UTF8LengthBetween(1, 127),
-					stringvalidator.NoneOfCaseInsensitive(static.ReservedWords...),
-					stringvalidator.NoneOfCaseInsensitive(static.SystemColumnNames...),
+					stringvalidator.NoneOfCaseInsensitive(helpers.ReservedWords...),
+					stringvalidator.NoneOfCaseInsensitive(helpers.SystemColumnNames...),
 				},
 			},
 			"password": schema.StringAttribute{

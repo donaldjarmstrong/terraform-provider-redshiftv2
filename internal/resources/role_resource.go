@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 	"terraform-provider-redshift/internal/generated"
+	"terraform-provider-redshift/internal/helpers"
 	"terraform-provider-redshift/internal/redshift"
-	"terraform-provider-redshift/internal/static"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -48,7 +48,7 @@ func (r *roleResource) Create(ctx context.Context, req resource.CreateRequest, r
 	}
 
 	r.ConnCfg.Tracer = &tracelog.TraceLog{
-		Logger:   static.NewLogger(ctx, "role_resource.Create"),
+		Logger:   helpers.NewLogger(ctx, "role_resource.Create"),
 		LogLevel: tracelog.LogLevelTrace,
 	}
 
@@ -97,7 +97,7 @@ func (r *roleResource) Read(ctx context.Context, req resource.ReadRequest, resp 
 	}
 
 	r.ConnCfg.Tracer = &tracelog.TraceLog{
-		Logger:   static.NewLogger(ctx, "role_resource.Read"),
+		Logger:   helpers.NewLogger(ctx, "role_resource.Read"),
 		LogLevel: tracelog.LogLevelTrace,
 	}
 
@@ -126,8 +126,6 @@ func (r *roleResource) Read(ctx context.Context, req resource.ReadRequest, resp 
 	state.ExternalId = types.StringPointerValue(role.ExternalId)
 	state.Name = types.StringValue(role.RoleName)
 
-	state.ExternalId = types.StringPointerValue(role.ExternalId)
-
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &state)...)
 	if resp.Diagnostics.HasError() {
@@ -141,13 +139,12 @@ func (r *roleResource) Update(ctx context.Context, req resource.UpdateRequest, r
 	// Read Terraform plan data into the model
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
 	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
-
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	r.ConnCfg.Tracer = &tracelog.TraceLog{
-		Logger:   static.NewLogger(ctx, "role_resource.Update"),
+		Logger:   helpers.NewLogger(ctx, "role_resource.Update"),
 		LogLevel: tracelog.LogLevelTrace,
 	}
 
@@ -201,7 +198,7 @@ func (r *roleResource) Delete(ctx context.Context, req resource.DeleteRequest, r
 	}
 
 	r.ConnCfg.Tracer = &tracelog.TraceLog{
-		Logger:   static.NewLogger(ctx, "role_resource.Delete"),
+		Logger:   helpers.NewLogger(ctx, "role_resource.Delete"),
 		LogLevel: tracelog.LogLevelTrace,
 	}
 
