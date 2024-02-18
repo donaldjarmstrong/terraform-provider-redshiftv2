@@ -4,6 +4,7 @@ package generated
 
 import (
 	"context"
+	"github.com/hashicorp/terraform-plugin-framework-validators/setvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
@@ -14,17 +15,9 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 )
 
-func RoleResourceSchema(ctx context.Context) schema.Schema {
+func GroupResourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
 		Attributes: map[string]schema.Attribute{
-			"external_id": schema.StringAttribute{
-				Optional:            true,
-				Description:         "The identifier for the role, which is associated with an identity provider. For more information, see Native identity provider (IdP) federation for Amazon Redshift.",
-				MarkdownDescription: "The identifier for the role, which is associated with an identity provider. For more information, see Native identity provider (IdP) federation for Amazon Redshift.",
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.UseStateForUnknown(),
-				},
-			},
 			"id": schema.StringAttribute{
 				Computed:            true,
 				Description:         "Built-in identifier",
@@ -35,20 +28,30 @@ func RoleResourceSchema(ctx context.Context) schema.Schema {
 			},
 			"name": schema.StringAttribute{
 				Required:            true,
-				Description:         "The name of the role. The role name must be unique and can't be the same as any user names. A role name can't be a reserved word.",
-				MarkdownDescription: "The name of the role. The role name must be unique and can't be the same as any user names. A role name can't be a reserved word.",
+				Description:         "Name of the new user group. Group names beginning with two underscores are reserved for Amazon Redshift internal use. For more information about valid names, see Names and identifiers.",
+				MarkdownDescription: "Name of the new user group. Group names beginning with two underscores are reserved for Amazon Redshift internal use. For more information about valid names, see Names and identifiers.",
 				Validators: []validator.String{
 					stringvalidator.NoneOfCaseInsensitive(`public`),
 					stringvalidator.UTF8LengthBetween(1, 127),
 					stringvalidator.NoneOfCaseInsensitive(helpers.ReservedWords...),
 				},
 			},
+			"usernames": schema.SetAttribute{
+				ElementType:         types.StringType,
+				Optional:            true,
+				Computed:            true,
+				Description:         "Name(s) of the user to add to the group.",
+				MarkdownDescription: "Name(s) of the user to add to the group.",
+				Validators: []validator.Set{
+					setvalidator.IsRequired(),
+				},
+			},
 		},
 	}
 }
 
-type RoleModel struct {
-	ExternalId types.String `tfsdk:"external_id"`
-	Id         types.String `tfsdk:"id"`
-	Name       types.String `tfsdk:"name"`
+type GroupModel struct {
+	Id        types.String `tfsdk:"id"`
+	Name      types.String `tfsdk:"name"`
+	Usernames types.Set    `tfsdk:"usernames"`
 }

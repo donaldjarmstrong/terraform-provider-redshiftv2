@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"runtime/debug"
 	"terraform-provider-redshift/internal/generated"
+	"terraform-provider-redshift/internal/helpers"
 	"terraform-provider-redshift/internal/resources"
-	"terraform-provider-redshift/internal/static"
 
 	"github.com/jackc/pgx/v5"
 
@@ -61,7 +61,7 @@ func (p *RedshiftProvider) Configure(ctx context.Context, req provider.Configure
 	}
 
 	t := "user={{(StringValue .Username)}} password={{(StringValue .Password)}} host={{(StringValue .Host)}} port={{(Int64Value .Port)}} dbname={{(StringValue .Dbname)}} {{if (StringValue .Sslmode) -}} sslmode={{(StringValue .Sslmode)}} {{end}}application_name={{(StringValue .ApplicationName)}}{{if (Int64Value .Timeout)}} connect_timeout={{(Int64Value .Timeout)}}{{end}}"
-	dsn, err := static.Merge(t, cfg)
+	dsn, err := helpers.Merge(t, cfg)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Unable to create database dsn",
@@ -116,6 +116,7 @@ func (p *RedshiftProvider) Resources(ctx context.Context) []func() resource.Reso
 	return []func() resource.Resource{
 		resources.NewUserResource,
 		resources.NewRoleResource,
+		resources.NewGroupResource,
 	}
 }
 
