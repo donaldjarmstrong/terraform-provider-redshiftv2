@@ -75,7 +75,7 @@ func testAccPreCheck(t *testing.T) {
 }
 
 func TestAccProvider_config(t *testing.T) {
-	user1 := "tst-terraform" + strings.ToUpper(acctest.RandStringFromCharSet(10, helpers.CharSetAlpha))
+	user1 := "tst-user1" + strings.ToUpper(acctest.RandStringFromCharSet(10, helpers.CharSetAlpha))
 
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,

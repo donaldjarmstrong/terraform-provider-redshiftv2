@@ -11,8 +11,8 @@ import (
 )
 
 func TestAccRole_basic(t *testing.T) {
-	role1 := "tst-terraform" + strings.ToUpper(acctest.RandStringFromCharSet(10, helpers.CharSetAlpha))
-	role2 := "tst-terraform" + strings.ToUpper(acctest.RandStringFromCharSet(10, helpers.CharSetAlpha))
+	role1 := "tst-role1" + strings.ToUpper(acctest.RandStringFromCharSet(10, helpers.CharSetAlpha))
+	role2 := "tst-role2" + strings.ToUpper(acctest.RandStringFromCharSet(10, helpers.CharSetAlpha))
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
