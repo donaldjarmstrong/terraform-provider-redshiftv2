@@ -106,8 +106,8 @@ func TestAccGroup_users(t *testing.T) {
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("redshift_group.test", "name", "test"),
 					resource.TestCheckResourceAttr("redshift_group.test", "usernames.#", "2"),
-					resource.TestCheckResourceAttr("redshift_group.test", "usernames.0", "test3"),
-					resource.TestCheckResourceAttr("redshift_group.test", "usernames.1", "test2"),
+					resource.TestCheckResourceAttr("redshift_group.test", "usernames.0", "test2"),
+					resource.TestCheckResourceAttr("redshift_group.test", "usernames.1", "test3"),
 				),
 			},
 			// ImportState testing
