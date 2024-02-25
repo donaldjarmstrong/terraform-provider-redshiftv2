@@ -25,7 +25,7 @@ func RedshiftProviderSchema(ctx context.Context) schema.Schema {
 				Description:         "dbname",
 				MarkdownDescription: "dbname",
 				Validators: []validator.String{
-					stringvalidator.LengthAtLeast(5),
+					stringvalidator.LengthAtLeast(1),
 				},
 			},
 			"host": schema.StringAttribute{

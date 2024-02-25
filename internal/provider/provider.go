@@ -6,7 +6,6 @@ import (
 	"runtime/debug"
 	"terraform-provider-redshift/internal/generated"
 	"terraform-provider-redshift/internal/helpers"
-	"terraform-provider-redshift/internal/resources"
 
 	"github.com/jackc/pgx/v5"
 
@@ -85,10 +84,6 @@ func (p *RedshiftProvider) Configure(ctx context.Context, req provider.Configure
 		return
 	}
 
-	ctx = tflog.SetField(ctx, "timeout", conn_cfg.ConnectTimeout.Seconds())
-	ctx = tflog.SetField(ctx, "params", conn_cfg.RuntimeParams)
-	tflog.Debug(ctx, "dumping config")
-
 	conn, err := pgx.ConnectConfig(ctx, conn_cfg)
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -114,9 +109,9 @@ func (p *RedshiftProvider) Configure(ctx context.Context, req provider.Configure
 
 func (p *RedshiftProvider) Resources(ctx context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
-		resources.NewUserResource,
-		resources.NewRoleResource,
-		resources.NewGroupResource,
+		NewUserResource,
+		NewRoleResource,
+		NewGroupResource,
 	}
 }
 

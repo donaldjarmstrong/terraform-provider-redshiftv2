@@ -57,7 +57,7 @@
                       "path": "github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
                     }
                   ],
-                  "schema_definition": "stringvalidator.LengthAtLeast(5)"
+                  "schema_definition": "stringvalidator.LengthAtLeast(1)"
                 }
               }
             ]
