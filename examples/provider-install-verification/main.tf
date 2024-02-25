@@ -7,9 +7,9 @@ terraform {
 }
 
 provider "redshift" {
-  # host     = var.host
-  # port     = var.port
-  # username = var.username
+  host     = var.host
+  port     = var.port
+  username = var.username
   password = var.password
   dbname   = var.dbname
   sslmode  = var.sslmode

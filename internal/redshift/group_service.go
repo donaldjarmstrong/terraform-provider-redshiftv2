@@ -145,6 +145,16 @@ func (s *GroupService) CreateGroup(args CreateGroupDDLParams) (*Group, error) {
 	name := args.Name // save this unsanitized for lookup later
 	args.Name = pgx.Identifier{args.Name}.Sanitize()
 
+	if args.Usernames != nil && len(*args.Usernames) > 0 {
+		usernames := []string{}
+
+		for _, username := range *args.Usernames {
+			usernames = append(usernames, pgx.Identifier{username}.Sanitize())
+		}
+
+		args.Usernames = &usernames
+	}
+
 	ctx, cancel := context.WithTimeout(s.ctx, s.timeout)
 	defer cancel()
 

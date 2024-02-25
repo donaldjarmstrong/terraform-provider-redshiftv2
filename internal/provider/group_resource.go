@@ -210,8 +210,6 @@ func (r *groupResource) Update(ctx context.Context, req resource.UpdateRequest, 
 
 		ddl.Add = &adds
 		ddl.Drop = &drops
-
-		fmt.Printf("add=%s drop=%s in=%s out=%s plan=%s state=%s", *ddl.Add, *ddl.Drop, plan_usernames, state_usernames, plan.Usernames, state.Usernames)
 	}
 
 	svc, err := redshift.NewGroupService(ctx, r.ConnCfg)

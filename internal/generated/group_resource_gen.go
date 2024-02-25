@@ -4,13 +4,14 @@ package generated
 
 import (
 	"context"
+	"terraform-provider-redshift/internal/helpers"
+
 	"github.com/hashicorp/terraform-plugin-framework-validators/setvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"terraform-provider-redshift/internal/helpers"
 
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 )
@@ -34,6 +35,7 @@ func GroupResourceSchema(ctx context.Context) schema.Schema {
 					stringvalidator.NoneOfCaseInsensitive(`public`),
 					stringvalidator.UTF8LengthBetween(1, 127),
 					stringvalidator.NoneOfCaseInsensitive(helpers.ReservedWords...),
+					stringvalidator.RegexMatches(helpers.IdentifierValidCharacters, helpers.IdentifierValidCharactersMessage),
 				},
 			},
 			"usernames": schema.SetAttribute{

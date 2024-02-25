@@ -1,11 +1,15 @@
 package provider
 
 import (
+	"fmt"
 	"os"
+	"strings"
+	"terraform-provider-redshift/internal/helpers"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
 	"github.com/hashicorp/terraform-plugin-go/tfprotov6"
+	"github.com/hashicorp/terraform-plugin-testing/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 )
 
@@ -70,20 +74,22 @@ func testAccPreCheck(t *testing.T) {
 	}
 }
 
-func TestProvider_Config(t *testing.T) {
+func TestAccProvider_config(t *testing.T) {
+	user1 := "tst-terraform" + strings.ToUpper(acctest.RandStringFromCharSet(10, helpers.CharSetAlpha))
+
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		PreCheck:                 func() { testAccPreCheck(t) },
 		Steps: []resource.TestStep{
 			{
 				ResourceName: "Test Config Provider",
-				Config: providerConfig + `
-				resource redshift_user provider_test {
-					name = "provider_test"
+				Config: providerConfig + fmt.Sprintf(`
+				resource redshift_user under_test {
+					name = "%s"
 				}
-				`,
+				`, user1),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("redshift_user.provider_test", "name", "provider_test"),
+					resource.TestCheckResourceAttr("redshift_user.under_test", "name", user1),
 				),
 			},
 		},
