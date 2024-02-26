@@ -1,6 +1,9 @@
 package helpers
 
-import "regexp"
+import (
+	"fmt"
+	"regexp"
+)
 
 /*
 Names identify database objects, including tables and columns, as well as users and passwords.
@@ -27,7 +30,9 @@ var SystemColumnNames = []string{
 
 // Begin with an ASCII single-byte alphabetic character or underscore character.
 // Subsequent characters can be ASCII single-byte alphanumeric characters, underscores, or dollar signs.
-var IdentifierValidCharacters = regexp.MustCompile(`^[a-zA-Z_][a-zA-Z0-9_\$]*$`)
+var IdentifierValidCharactersPattern = `^[a-zA-Z_][a-zA-Z0-9_\$]*$`
+var IdentifierValidCharacters = regexp.MustCompile(IdentifierValidCharactersPattern)
+var IdentifierValidCharactersMessage = fmt.Sprintf("Must match identifier regex pattern %s", IdentifierValidCharactersPattern)
 
 // The following is a list of Amazon Redshift reserved words. You can use the reserved words with delimited
 // identifiers (double quotation marks).  See https://docs.aws.amazon.com/redshift/latest/dg/r_pg_keywords.html
@@ -192,7 +197,10 @@ var ReservedWords = []string{
 	"without",
 }
 
-// It must contain at least one uppercase letter, one lowercase letter, and one number
-// var
+const (
+	// CharSetAlphaNum is the alphanumeric character set for use with RandStringFromCharSet.
+	CharSetAlphaNum = "abcdefghijklmnopqrstuvwxyz012346789"
 
-// (?=.*\d)(?=.*[a-z])(?=.*[A-Z])((?=.*\W)|(?=.*_))^[^ ]+$
+	// CharSetAlpha is the alphabetical character set for use with RandStringFromCharSet.
+	CharSetAlpha = "abcdefghijklmnopqrstuvwxyz"
+)

@@ -142,9 +142,18 @@ func (s *GroupService) CreateGroup(args CreateGroupDDLParams) (*Group, error) {
 		CREATE GROUP {{.Name}}
 			{{if .Usernames}}{{$length := len .Usernames}}{{if gt $length 0 }}WITH USER {{(StringsJoin .Usernames ", ")}}{{end}}{{end}}
 	`
-	fmt.Printf("FFFFF %s", *args.Usernames)
 	name := args.Name // save this unsanitized for lookup later
 	args.Name = pgx.Identifier{args.Name}.Sanitize()
+
+	if args.Usernames != nil && len(*args.Usernames) > 0 {
+		usernames := []string{}
+
+		for _, username := range *args.Usernames {
+			usernames = append(usernames, pgx.Identifier{username}.Sanitize())
+		}
+
+		args.Usernames = &usernames
+	}
 
 	ctx, cancel := context.WithTimeout(s.ctx, s.timeout)
 	defer cancel()
@@ -229,12 +238,12 @@ func (s *GroupService) AlterGroup(args AlterGroupDDLParams) error {
 		`
 		sql, err := helpers.Merge(rename, args)
 		if err != nil {
-			return fmt.Errorf("AlterGroup: failed to merge adduser template: %w", err)
+			return fmt.Errorf("AlterGroup: failed to merge altergroup template: %w", err)
 		}
 
 		_, err = tx.Exec(ctx, sql)
 		if err != nil {
-			return fmt.Errorf("AlterGroup: failed to execute adduser: %w", err)
+			return fmt.Errorf("AlterGroup: failed to execute alter group: %w", err)
 		}
 	}
 
@@ -252,12 +261,12 @@ func (s *GroupService) AlterGroup(args AlterGroupDDLParams) error {
 		`
 		sql, err := helpers.Merge(rename, args)
 		if err != nil {
-			return fmt.Errorf("AlterGroup: failed to merge dropusers template: %w", err)
+			return fmt.Errorf("AlterGroup: failed to merge alter group template: %w", err)
 		}
 
 		_, err = tx.Exec(ctx, sql)
 		if err != nil {
-			return fmt.Errorf("AlterGroup: failed to execute dropuser: %w", err)
+			return fmt.Errorf("AlterGroup: failed to execute alter group: %w", err)
 		}
 	}
 

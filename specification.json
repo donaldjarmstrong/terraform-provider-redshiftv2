@@ -57,7 +57,7 @@
                       "path": "github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
                     }
                   ],
-                  "schema_definition": "stringvalidator.LengthAtLeast(5)"
+                  "schema_definition": "stringvalidator.LengthAtLeast(1)"
                 }
               }
             ]
@@ -494,6 +494,19 @@
                       }
                     ],
                     "schema_definition": "stringvalidator.NoneOfCaseInsensitive(helpers.ReservedWords...)"
+                  }
+                },
+                {
+                  "custom": {
+                    "imports": [
+                      {
+                        "path": "github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+                      },
+                      {
+                        "path": "terraform-provider-redshift/internal/helpers"
+                      }
+                    ],
+                    "schema_definition": "stringvalidator.RegexMatches(helpers.IdentifierValidCharacters, helpers.IdentifierValidCharactersMessage)"
                   }
                 }
               ]
